@@ -1,0 +1,83 @@
+---
+title: "UK BAME Organ Recipient Rates by Donors"
+author: "Moaeed Sajid"
+date: "11th December 2018"
+
+output: ioslides_presentation
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(plotly)
+library(knitr)
+library(kableExtra)
+```
+
+## Introduction {.smaller}
+
+We have used the Donors and Transplant Recipient tables from Page 8 of...
+
+<https://nhsbtdbe.blob.core.windows.net/umbraco-assets-corp/11669/bame-organ-donation-and-transplantation-data-2017-18.pdf>
+
+Organ transplant teams try and match the donor and recipient as close as possible to help reduce waiting times, rejection rates and early death due to  insufficient availability for ethnic minority patients.
+
+This mini project will look to see how well these targets can be met by comparing the donor and recipient rate between each ethnic group 
+
+Each donor can donate multiple organs and hence save many lives so for the purpose of this project each of the tables was broken down into percentages and then a chart was drawn up to show the rate of recipients by donors for each ethnicity
+
+## {.smaller}
+
+```{r, include=FALSE}
+library(plotly)
+donors <- data.frame( White = c(1245, 1202,1296,1308,1441), Asian = c(39,32,27,29,37), Black = c(17,20,20,23,25), Other = c(15,28,20,39,52))
+recipients <- data.frame(White = c(2784,2615,2711,2865,3097), Asian = c(400,417,469,486,508), Black = c(215,197,216,234,251), Other = c(91,87,97,91,142))
+Yrs <- data.frame(Year = c("2013/14", "2014/15", "2015/16", "2016/17", "2017/18"))
+
+pDonors <- prop.table(as.matrix(donors),1)*100
+pRecipients <- prop.table(as.matrix(recipients),1)*100
+
+pDonRec <- pRecipients/pDonors
+
+pDonors <- round(pDonors,2)
+pRecipients <- round(pRecipients,2)
+pDonRec <- round(pDonRec,2)
+
+pDonRec <- cbind(Yrs, pDonRec)
+pDonors <- cbind(Yrs, pDonors)
+pRecipients <- cbind(Yrs, pRecipients)
+```
+
+
+```{r, results='asis', .smaller}
+kable(pDonors, caption = "Donors by Percentage", align=c('l', 'c', 'c', 'c', 'c'))%>%
+        kable_styling(latex_options = "scale_down")
+kable(pRecipients, caption = "Recipients by Percentage", align=c('l', 'c', 'c', 'c', 'c')) %>%
+        kable_styling(latex_options = "scale_down")
+
+```
+
+
+## Organ Donor Recipient Rate
+
+```{r, include = FALSE}
+p <- plot_ly(data = pDonRec, x= ~ Year, y = ~White, type = "bar", name = "White") %>%
+     add_trace(y = ~Other, name = "Other") %>%
+     add_trace(y = ~Black, name = "Black") %>%
+     add_trace(y = ~Asian, name = "Asian") %>%
+     layout(title = "Organ Recipient Rate by Ethnicity" , yaxis = list(title = "Recipient Rate", barmode = "group"))
+```
+
+```{r}
+p
+```
+
+## Conclusion {.smaller}
+
+In conclusion we can determine the following
+
+ - With a Recipient Rate below 1 white donors are well represented
+ - The recipient rate for the other category varies around 1 donor to 1 recipient mark. This just needs to be monitored
+ - The recipient rate for black donors has remained around 4 for the last 5 years.  More work needs to be done here to encourage donors to come forward
+ - Although the trend for the recipient rate for Asian donors has been reducing in the last three years it is still the highest.  More awareness should to be done within this ethnic community to raise the number of donors
+
+Although the document linked in slide 1 already shows that the waiting times are much longer for BAME patients this study could also be strengthened by looking at the rejection rates by ethnic groups.
